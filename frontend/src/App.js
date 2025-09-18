@@ -250,6 +250,14 @@ function App() {
               />
             }
           />
+          <Route
+            path="/seller-dashboard"
+            element={<SellerDashboard />}
+          />
+          <Route
+            path="/admin-dashboard"
+            element={<AdminDashboard />}
+          />
         </Routes>
 
         <AuthModal
