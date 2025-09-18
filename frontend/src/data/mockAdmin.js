@@ -3,7 +3,7 @@
 export const mockAdmin = {
   id: 'admin123',
   name: 'Admin User',
-  email: 'admin@servicehub.com',
+  email: 'admin@loczu.com',
   role: 'admin',
   permissions: ['all'],
   lastLogin: '2024-01-20T09:00:00Z'
@@ -235,9 +235,9 @@ export const mockReportedContent = [
 
 export const mockSystemSettings = {
   platform: {
-    platformName: 'ServiceHub',
+    platformName: 'Loczu',
     platformDescription: 'Multi-service marketplace platform',
-    supportEmail: 'support@servicehub.com',
+    supportEmail: 'support@loczu.com',
     platformFee: 5.0, // percentage
     deliveryRadius: 25, // kilometers
     minimumOrderValue: 10.00,

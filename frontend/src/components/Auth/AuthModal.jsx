@@ -61,7 +61,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
             <X className="h-4 w-4" />
           </Button>
           <CardTitle className="text-center text-2xl font-bold text-gray-900">
-            Welcome to ServiceHub
+            Welcome to Loczu
           </CardTitle>
         </CardHeader>
 

@@ -27,9 +27,9 @@ function App() {
 
   // Load data from localStorage on app start
   useEffect(() => {
-    const savedUser = localStorage.getItem('serviceHub_user');
-    const savedCart = localStorage.getItem('serviceHub_cart');
-    const savedWishlist = localStorage.getItem('serviceHub_wishlist');
+    const savedUser = localStorage.getItem('loczu_user');
+    const savedCart = localStorage.getItem('loczu_cart');
+    const savedWishlist = localStorage.getItem('loczu_wishlist');
     
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -44,15 +44,15 @@ function App() {
 
   // Save data to localStorage whenever state changes
   useEffect(() => {
-    localStorage.setItem('serviceHub_user', JSON.stringify(user));
+    localStorage.setItem('loczu_user', JSON.stringify(user));
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('serviceHub_cart', JSON.stringify(cartItems));
+    localStorage.setItem('loczu_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    localStorage.setItem('serviceHub_wishlist', JSON.stringify(wishlistItems));
+    localStorage.setItem('loczu_wishlist', JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
   // Authentication handlers
@@ -67,7 +67,7 @@ function App() {
   const handleRegister = (userData) => {
     setUser({ ...userData, isLoggedIn: true });
     toast({
-      title: "Welcome to ServiceHub!",
+      title: "Welcome to Loczu!",
       description: "Your account has been created successfully.",
     });
   };
@@ -76,9 +76,9 @@ function App() {
     setUser({ ...mockUser, isLoggedIn: false });
     setCartItems([]);
     setWishlistItems([]);
-    localStorage.removeItem('serviceHub_user');
-    localStorage.removeItem('serviceHub_cart');
-    localStorage.removeItem('serviceHub_wishlist');
+    localStorage.removeItem('loczu_user');
+    localStorage.removeItem('loczu_cart');
+    localStorage.removeItem('loczu_wishlist');
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",

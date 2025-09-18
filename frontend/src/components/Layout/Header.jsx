@@ -30,7 +30,7 @@ const Header = ({
           {/* Logo */}
           <div className="flex items-center">
             <div className="text-2xl font-bold text-red-600 mr-8">
-              ServiceHub
+              Loczu
             </div>
           </div>
 
