@@ -105,6 +105,28 @@ const Header = ({
               </span>
             </Button>
 
+            {/* Seller/Admin Access */}
+            {user?.isLoggedIn && (
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = '/seller-dashboard'}
+                  className="border-red-200 text-red-600 hover:bg-red-50 text-xs"
+                >
+                  Seller Hub
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = '/admin-dashboard'}
+                  className="border-gray-200 text-gray-600 hover:bg-gray-50 text-xs"
+                >
+                  Admin
+                </Button>
+              </div>
+            )}
+
             {/* Mobile Menu */}
             <Button
               variant="ghost"
