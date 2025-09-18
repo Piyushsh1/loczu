@@ -9,6 +9,8 @@ import HomePage from "./pages/HomePage";
 import BusinessDetailPage from "./pages/BusinessDetailPage";
 import CartPage from "./pages/CartPage";
 import WishlistPage from "./pages/WishlistPage";
+import SellerDashboard from "./pages/SellerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import AuthModal from "./components/Auth/AuthModal";
 
 // Mock Data
