@@ -1,3 +1,5 @@
+// Mock data for seller dashboard
+
 import { businessCategories } from '../data/mock';
 
 export const mockSeller = {
