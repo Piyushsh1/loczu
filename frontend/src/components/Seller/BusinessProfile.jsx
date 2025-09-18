@@ -22,7 +22,8 @@ import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { Separator } from '../ui/separator';
 import { useToast } from '../../hooks/use-toast';
-import { mockSellerBusinesses, businessCategories } from '../../data/mockSeller';
+import { mockSellerBusinesses } from '../../data/mockSeller';
+import { businessCategories } from '../../data/mock';
 
 const BusinessProfile = ({ seller }) => {
   const { toast } = useToast();
