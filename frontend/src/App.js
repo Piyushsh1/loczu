@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ApolloProvider } from '@apollo/client';
 import { Toaster } from "./components/ui/toaster";
 import { useToast } from "./hooks/use-toast";
+import apolloClient from "./lib/apollo";
+import { AuthProvider, useAuthContext } from "./contexts/AuthContext";
 
 // Components
 import Header from "./components/Layout/Header";
@@ -16,24 +19,20 @@ import AuthModal from "./components/Auth/AuthModal";
 // Mock Data
 import { mockUser, mockCart, mockWishlist } from "./data/mock";
 
-function App() {
+function AppContent() {
   // State Management
-  const [user, setUser] = useState(mockUser);
   const [cartItems, setCartItems] = useState(mockCart);
   const [wishlistItems, setWishlistItems] = useState(mockWishlist);
   const [showAuthModal, setShowAuthModal] = useState(false);
   
   const { toast } = useToast();
+  const { user, isAuthenticated, logout } = useAuthContext();
 
   // Load data from localStorage on app start
   useEffect(() => {
-    const savedUser = localStorage.getItem('loczu_user');
     const savedCart = localStorage.getItem('loczu_cart');
     const savedWishlist = localStorage.getItem('loczu_wishlist');
     
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
     }
@@ -44,10 +43,6 @@ function App() {
 
   // Save data to localStorage whenever state changes
   useEffect(() => {
-    localStorage.setItem('loczu_user', JSON.stringify(user));
-  }, [user]);
-
-  useEffect(() => {
     localStorage.setItem('loczu_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
@@ -56,38 +51,13 @@ function App() {
   }, [wishlistItems]);
 
   // Authentication handlers
-  const handleLogin = (userData) => {
-    setUser({ ...userData, isLoggedIn: true });
-    toast({
-      title: "Welcome back!",
-      description: `Good to see you again, ${userData.name}!`,
-    });
-  };
-
-  const handleRegister = (userData) => {
-    setUser({ ...userData, isLoggedIn: true });
-    toast({
-      title: "Welcome to Loczu!",
-      description: "Your account has been created successfully.",
-    });
-  };
-
-  const handleLogout = () => {
-    setUser({ ...mockUser, isLoggedIn: false });
-    setCartItems([]);
-    setWishlistItems([]);
-    localStorage.removeItem('loczu_user');
-    localStorage.removeItem('loczu_cart');
-    localStorage.removeItem('loczu_wishlist');
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-  };
-
   const handleAuthClick = () => {
-    if (user.isLoggedIn) {
-      handleLogout();
+    if (isAuthenticated) {
+      logout();
+      setCartItems([]);
+      setWishlistItems([]);
+      localStorage.removeItem('loczu_cart');
+      localStorage.removeItem('loczu_wishlist');
     } else {
       setShowAuthModal(true);
     }
@@ -95,7 +65,7 @@ function App() {
 
   // Cart handlers
   const handleAddToCart = (item) => {
-    if (!user.isLoggedIn) {
+    if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
@@ -152,7 +122,7 @@ function App() {
 
   // Wishlist handlers
   const handleAddToWishlist = (business) => {
-    if (!user.isLoggedIn) {
+    if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
@@ -184,18 +154,25 @@ function App() {
   };
 
   const handleWishlistClick = () => {
-    if (!user.isLoggedIn) {
+    if (!isAuthenticated) {
       setShowAuthModal(true);
       return;
     }
     window.location.href = '/wishlist';
   };
 
+  // Adapt user object for Header component
+  const headerUser = user ? {
+    ...user,
+    isLoggedIn: isAuthenticated,
+    name: user.fullName || user.name
+  } : { isLoggedIn: false };
+
   return (
     <div className="App">
       <BrowserRouter>
         <Header
-          user={user}
+          user={headerUser}
           cartCount={cartItems.length}
           wishlistCount={wishlistItems.length}
           onAuthClick={handleAuthClick}
@@ -263,13 +240,21 @@ function App() {
         <AuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
-          onLogin={handleLogin}
-          onRegister={handleRegister}
         />
 
         <Toaster />
       </BrowserRouter>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ApolloProvider client={apolloClient}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ApolloProvider>
   );
 }
 

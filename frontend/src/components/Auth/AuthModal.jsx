@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Phone } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { useAuth } from '../../hooks/useAuth';
 
 const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
@@ -15,36 +16,57 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
     password: '',
     confirmPassword: ''
   });
+  const [errors, setErrors] = useState({});
 
-  const handleLogin = (e) => {
+  const { login, register, loginLoading, registerLoading } = useAuth();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate login
-    const userData = {
-      id: 'user123',
-      name: 'John Doe',
-      email: loginData.email,
-      isLoggedIn: true
-    };
-    onLogin(userData);
-    onClose();
+    setErrors({});
+    
+    try {
+      await login(loginData.email, loginData.password);
+      // If login is successful, the useAuth hook will handle the state update
+      // We'll close the modal after a successful login
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (error) {
+      setErrors({ login: error.message });
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setErrors({});
+
     if (registerData.password !== registerData.confirmPassword) {
-      alert('Passwords do not match');
+      setErrors({ confirmPassword: 'Passwords do not match' });
       return;
     }
-    // Simulate registration
-    const userData = {
-      id: 'user123',
-      name: registerData.name,
-      email: registerData.email,
-      phone: registerData.phone,
-      isLoggedIn: true
-    };
-    onRegister(userData);
-    onClose();
+
+    if (registerData.password.length < 8) {
+      setErrors({ password: 'Password must be at least 8 characters long' });
+      return;
+    }
+
+    try {
+      await register({
+        name: registerData.name,
+        email: registerData.email,
+        phone: registerData.phone,
+        password: registerData.password,
+        userType: 'CUSTOMER',
+        customerCategory: 'GENERAL'
+      });
+      // If registration is successful, the useAuth hook will handle the state update
+      // We'll close the modal after a successful registration
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+    } catch (error) {
+      setErrors({ register: error.message });
+    }
   };
 
   if (!isOpen) return null;
@@ -74,6 +96,12 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
+                {errors.login && (
+                  <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                    {errors.login}
+                  </div>
+                )}
+                
                 <div>
                   <Label htmlFor="login-email">Email</Label>
                   <div className="relative">
@@ -86,6 +114,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={loginLoading}
                     />
                   </div>
                 </div>
@@ -102,6 +131,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={loginLoading}
                     />
                   </div>
                 </div>
@@ -109,8 +139,16 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                 <Button 
                   type="submit" 
                   className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  disabled={loginLoading}
                 >
-                  Login
+                  {loginLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Logging in...
+                    </>
+                  ) : (
+                    'Login'
+                  )}
                 </Button>
 
                 <div className="text-center text-sm text-gray-600">
@@ -123,6 +161,12 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
 
             <TabsContent value="register">
               <form onSubmit={handleRegister} className="space-y-4">
+                {errors.register && (
+                  <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                    {errors.register}
+                  </div>
+                )}
+                
                 <div>
                   <Label htmlFor="register-name">Full Name</Label>
                   <div className="relative">
@@ -135,6 +179,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setRegisterData({...registerData, name: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={registerLoading}
                     />
                   </div>
                 </div>
@@ -151,6 +196,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={registerLoading}
                     />
                   </div>
                 </div>
@@ -167,6 +213,7 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setRegisterData({...registerData, phone: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={registerLoading}
                     />
                   </div>
                 </div>
@@ -178,13 +225,17 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                     <Input
                       id="register-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a password (min 8 characters)"
                       value={registerData.password}
                       onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={registerLoading}
                     />
                   </div>
+                  {errors.password && (
+                    <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                  )}
                 </div>
 
                 <div>
@@ -199,15 +250,27 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister }) => {
                       onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
                       className="pl-10"
                       required
+                      disabled={registerLoading}
                     />
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
+                  )}
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full bg-red-600 hover:bg-red-700 text-white"
+                  disabled={registerLoading}
                 >
-                  Create Account
+                  {registerLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    'Create Account'
+                  )}
                 </Button>
 
                 <div className="text-center text-xs text-gray-600">
