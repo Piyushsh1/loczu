@@ -1,1 +1,1 @@
-# Middleware package for request/response processing
+# Middleware Package

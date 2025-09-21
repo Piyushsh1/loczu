@@ -1,1 +1,1 @@
-# Context package for GraphQL context management
+# Context Package

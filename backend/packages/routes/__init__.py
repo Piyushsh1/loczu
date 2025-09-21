@@ -1,1 +1,4 @@
-# Routes package for API endpoints
+from .Account import *
+from .Category import *
+
+__all__ = ['Account', 'Category']
