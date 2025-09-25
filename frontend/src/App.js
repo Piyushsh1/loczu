@@ -12,6 +12,8 @@ import HomePage from "./pages/HomePage";
 import BusinessDetailPage from "./pages/BusinessDetailPage";
 import CartPage from "./pages/CartPage";
 import WishlistPage from "./pages/WishlistPage";
+import ProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage";
 import SellerDashboard from "./pages/SellerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AuthModal from "./components/Auth/AuthModal";
@@ -53,14 +55,23 @@ function AppContent() {
   // Authentication handlers
   const handleAuthClick = () => {
     if (isAuthenticated) {
-      logout();
-      setCartItems([]);
-      setWishlistItems([]);
-      localStorage.removeItem('loczu_cart');
-      localStorage.removeItem('loczu_wishlist');
+      // When user is logged in, clicking their name should show profile options
+      // For now, we'll do nothing (user can see they're logged in)
+      // TODO: Implement user dropdown menu with profile, settings, logout options
+      console.log('User profile clicked - implement dropdown menu here');
     } else {
+      // When user is not logged in, show login modal
       setShowAuthModal(true);
     }
+  };
+
+  // Separate logout handler
+  const handleLogout = () => {
+    logout();
+    setCartItems([]);
+    setWishlistItems([]);
+    localStorage.removeItem('loczu_cart');
+    localStorage.removeItem('loczu_wishlist');
   };
 
   // Cart handlers
@@ -178,6 +189,7 @@ function AppContent() {
           onAuthClick={handleAuthClick}
           onCartClick={handleCartClick}
           onWishlistClick={handleWishlistClick}
+          onLogout={handleLogout}
         />
         
         <Routes>
@@ -226,6 +238,25 @@ function AppContent() {
                 cartItems={cartItems}
               />
             }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProfilePage
+                user={user}
+                onUpdateProfile={(updatedData) => {
+                  console.log('Profile updated:', updatedData);
+                  toast({
+                    title: "Profile Updated",
+                    description: "Your profile has been updated successfully.",
+                  });
+                }}
+              />
+            }
+          />
+          <Route
+            path="/orders"
+            element={<OrdersPage />}
           />
           <Route
             path="/seller-dashboard"

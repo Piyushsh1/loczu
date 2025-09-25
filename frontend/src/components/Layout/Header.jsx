@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, Heart, User, Menu, MapPin } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -11,10 +12,28 @@ const Header = ({
   onSearch, 
   onAuthClick,
   onCartClick,
-  onWishlistClick 
+  onWishlistClick,
+  onLogout
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('New York, NY');
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -93,17 +112,68 @@ const Header = ({
             </Button>
 
             {/* User Profile */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onAuthClick}
-              className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600 transition-colors"
-            >
-              <User className="h-5 w-5" />
-              <span className="hidden md:inline text-sm">
-                {user?.isLoggedIn ? user.name : 'Login'}
-              </span>
-            </Button>
+            {user?.isLoggedIn ? (
+              <div className="relative" ref={userMenuRef}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600 transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <span className="hidden md:inline text-sm">
+                    {user.name}
+                  </span>
+                </Button>
+                
+                {/* User Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg border rounded-md z-50">
+                    <div className="py-2">
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          navigate('/profile');
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                      >
+                        My Profile
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          // Navigate to orders page (create this route when needed)
+                          navigate('/orders');
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                      >
+                        My Orders
+                      </button>
+                      <hr className="my-1" />
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          if (onLogout) onLogout();
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onAuthClick}
+                className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600 transition-colors"
+              >
+                <User className="h-5 w-5" />
+                <span className="hidden md:inline text-sm">Login</span>
+              </Button>
+            )}
 
             {/* Seller/Admin Access */}
             {user?.isLoggedIn && (

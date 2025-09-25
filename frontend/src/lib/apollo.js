@@ -2,8 +2,10 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
 // Create an HTTP link to the GraphQL server
+// Use env var (in CRA: REACT_APP_*) with sensible default
+const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:8001';
 const httpLink = createHttpLink({
-  uri: 'http://localhost:8001/graphql',
+  uri: `${apiBase}/graphql`,
 });
 
 // Create an auth link to add the token to requests
